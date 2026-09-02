@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chasse aux risques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ffffff;
+    --ink:#181d23;
+    --grey:#8a93a0;
+    --line:#e8eaee;
+    --jaune:#ffd400;
+    --rouge:#ff3b1f;
+    --vert:#00b368;
+    --r:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--paper);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;min-height:100%}
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 44px}
+
+  /* bandeau chantier */
+  .band{
+    height:14px;
+    background:repeating-linear-gradient(-45deg,var(--jaune) 0 16px,var(--ink) 16px 32px);
+  }
+
+  .screen{display:none}
+  .screen.active{display:block;animation:pop .22s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  h1{font-weight:900;font-size:32px;line-height:1.05;letter-spacing:-.5px}
+
+  /* ---------- accueil ---------- */
+  .hero{padding:34px 0 6px;text-align:center}
+  .hero .logo{font-size:52px}
+  .hero h1{margin-top:6px}
+  .hero p{color:var(--grey);font-weight:600;margin-top:8px}
+
+  input[type=text], textarea{
+    width:100%;background:var(--paper);border:2px solid var(--line);color:var(--ink);
+    border-radius:var(--r);padding:15px 17px;font-size:17px;font-family:inherit;font-weight:600;outline:none;
+  }
+  input[type=text]:focus, textarea:focus{border-color:var(--ink)}
+  textarea{min-height:88px;resize:none;line-height:1.45}
+  ::placeholder{color:#b6bcc6;font-weight:600}
+
+  .tiles{display:grid;gap:12px;margin-top:18px}
+  .tile{
+    display:flex;align-items:center;gap:14px;border:2px solid var(--line);background:var(--paper);
+    border-radius:var(--r);padding:18px;font-family:inherit;font-size:19px;font-weight:900;color:var(--ink);
+    cursor:pointer;transition:transform .08s;text-align:left;
+  }
+  .tile:active{transform:scale(.97)}
+  .tile .ic{font-size:28px}
+  .tile.on{border-color:var(--ink);background:var(--jaune)}
+
+  .cta{
+    display:block;width:100%;margin-top:26px;background:var(--ink);color:#fff;border:none;
+    border-radius:999px;padding:19px;font-size:19px;font-weight:900;font-family:inherit;cursor:pointer;transition:transform .08s;
+  }
+  .cta:active{transform:scale(.97)}
+  .cta:disabled{opacity:.4}
+  .cta.rouge{background:var(--rouge)}
+  .cta.vert{background:var(--vert)}
+
+  /* ---------- hub missions ---------- */
+  .teambar{display:flex;align-items:center;justify-content:space-between;padding:20px 0 4px}
+  .teambar .tname{font-weight:900;font-size:18px}
+  .teambar button{background:none;border:none;color:var(--grey);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;text-decoration:underline}
+
+  .mission{
+    position:relative;display:block;width:100%;text-align:left;font-family:inherit;color:var(--ink);
+    border-radius:26px;padding:26px 24px;margin-top:16px;cursor:pointer;transition:transform .08s;border:none;
+  }
+  .mission:active{transform:scale(.98)}
+  .mission .ic{font-size:40px;display:block}
+  .mission h2{font-size:24px;font-weight:900;margin-top:10px}
+  .mission p{font-weight:600;font-size:15px;margin-top:4px;opacity:.75}
+  .mission.m1{background:#ffe9e4}
+  .mission.m2{background:#e0f6ec}
+  .mission .count{
+    position:absolute;top:20px;right:20px;min-width:46px;height:46px;border-radius:999px;padding:0 12px;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff;
+  }
+  .m1 .count{background:var(--rouge)} .m2 .count{background:var(--vert)}
+  .link-liste{display:block;margin:26px auto 0;background:none;border:none;color:var(--grey);font-family:inherit;font-weight:600;font-size:15px;text-decoration:underline;cursor:pointer}
+  .sync{color:var(--grey);font-size:13px;font-weight:600;text-align:center;margin-top:8px}
+  .cta.fin{background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
+  .fin-hero{text-align:center;padding:60px 0 10px}
+  .fin-hero .big{font-size:74px}
+  .fin-hero h2{font-weight:900;font-size:30px;margin-top:10px}
+  .fin-hero p{color:var(--grey);font-weight:600;margin-top:10px;line-height:1.5}
+  .fin-recap{display:flex;gap:12px;margin-top:26px}
+  .fin-recap .box{flex:1;border-radius:var(--r);padding:18px;text-align:center;font-weight:900}
+  .fin-recap .box .n{font-size:34px;display:block}
+  .fin-recap .box.r{background:#ffe9e4;color:var(--rouge)}
+  .fin-recap .box.b{background:#e0f6ec;color:var(--vert)}
+  .sheet .confirm-btns{display:flex;gap:10px;margin-top:22px}
+  .sheet .confirm-btns .cta{margin-top:0}
+
+  /* ---------- formulaires ---------- */
+  .form-top{display:flex;align-items:center;gap:12px;padding:18px 0 4px}
+  .back{background:none;border:2px solid var(--line);color:var(--ink);border-radius:14px;width:44px;height:44px;font-size:19px;cursor:pointer;flex:none}
+  .form-top h2{flex:1;text-align:center;font-weight:900;font-size:20px}
+  .ex-btn{background:none;border:none;font-size:22px;cursor:pointer;width:44px;height:44px;flex:none}
+
+  .lab{font-weight:900;font-size:17px;margin:22px 0 10px}
+
+  .photo-zone{
+    width:100%;aspect-ratio:16/9;border:3px dashed var(--line);border-radius:var(--r);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    font-family:inherit;font-weight:900;font-size:17px;color:var(--ink);background:#fafbfc;cursor:pointer;
+  }
+  .photo-zone .big{font-size:42px}
+  .photo-prev{position:relative;display:none}
+  .photo-prev img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r);display:block}
+  .photo-prev .redo{
+    position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.72);color:#fff;border:none;border-radius:999px;
+    padding:10px 16px;font-family:inherit;font-weight:900;font-size:14px;cursor:pointer;
+  }
+
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .chip{
+    border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:16px;
+    padding:13px 6px;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer;transition:transform .08s;
+  }
+  .chip:active{transform:scale(.95)}
+  .chip .cic{display:block;font-size:25px;margin-bottom:3px}
+  .f-m1 .chip.on{border-color:var(--rouge);background:#ffe9e4}
+  .f-m2 .chip.on{border-color:var(--vert);background:#e0f6ec}
+  .autre-risque{margin-top:10px}
+
+  /* ---------- exemple (volet bas) ---------- */
+  .sheet-bg{position:fixed;inset:0;background:rgba(24,29,35,.5);display:none;z-index:40}
+  .sheet-bg.show{display:block}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-radius:26px 26px 0 0;
+    padding:24px 24px 34px;z-index:41;transform:translateY(105%);transition:transform .28s ease;max-width:520px;margin:0 auto;
+  }
+  .sheet.show{transform:none}
+  .sheet h3{font-weight:900;font-size:20px;margin-bottom:14px}
+  .sheet .ex-line{display:flex;gap:10px;margin-top:12px;font-weight:600;font-size:15.5px;line-height:1.45}
+  .sheet .ex-line .eic{flex:none;font-size:20px}
+  .sheet .ex-line b{font-weight:900}
+
+  /* ---------- succès ---------- */
+  .flash{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;
+    background:var(--vert);color:#fff;z-index:60;
+  }
+  .flash.rouge{background:var(--rouge)}
+  .flash.show{display:flex;animation:pop .2s ease}
+  .flash .check{font-size:90px}
+  .flash .msg{font-weight:900;font-size:28px}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(130px);
+    background:var(--ink);color:#fff;font-weight:900;font-size:15px;padding:14px 22px;border-radius:999px;
+    transition:transform .3s;z-index:70;max-width:88vw;text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* ---------- liste ---------- */
+  .obs{border:2px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-top:12px;font-weight:600;font-size:15px;line-height:1.5}
+  .obs .tag{font-weight:900;display:block;margin-bottom:2px}
+  .obs .tag.r{color:var(--rouge)} .obs .tag.b{color:var(--vert)}
+  .obs p{color:var(--grey)}
+</style>
+</head>
+<body>
+<div class="band"></div>
+<div class="wrap">
+
+  <!-- ============ ACCUEIL ============ -->
+  <section class="screen active" id="screen-home">
+    <div class="hero">
+      <div class="logo">🕵️</div>
+      <h1>Chasse aux risques</h1>
+      <p>Ouvre l'œil dans l'atelier !</p>
+    </div>
+    <div style="margin-top:26px">
+      <input type="text" id="inp-groupe" placeholder="Nom de votre équipe" maxlength="30" autocomplete="off">
+      <div class="tiles">
+        <button class="tile" data-atelier="MELEC"><span class="ic">⚡</span>Atelier MELEC</button>
+        <button class="tile" data-atelier="TCI"><span class="ic">🔥</span>Atelier TCI</button>
+        <button class="tile" data-atelier="IMTB"><span class="ic">🏗️</span>Atelier IMTB</button>
+        <button class="tile" data-atelier="CIEL"><span class="ic">💻</span>Atelier CIEL</button>
+        <button class="tile" data-atelier="MSPC"><span class="ic">🔧</span>Atelier MSPC</button>
+      </div>
+      <button class="cta" id="btn-start">C'est parti</button>
+    </div>
+  </section>
+
+  <!-- ============ HUB ============ -->
+  <section class="screen" id="screen-missions">
+    <div class="teambar">
+      <div class="tname" id="tb-name"></div>
+      <button id="btn-change">changer</button>
+    </div>
+
+    <button class="mission m1" id="open-m1">
+      <span class="ic">🚨</span>
+      <h2>Traque les dangers</h2>
+      <p>Photo · risque · ton idée pour améliorer</p>
+      <div class="count" id="count-m1">0</div>
+    </button>
+
+    <button class="mission m2" id="open-m2">
+      <span class="ic">👍</span>
+      <h2>Repère ce qui protège</h2>
+      <p>Extincteurs, carters, arrêts d'urgence…</p>
+      <div class="count" id="count-m2">0</div>
+    </button>
+
+    <button class="cta fin" id="btn-fin">🏁 Terminer la chasse</button>
+    <button class="link-liste" id="btn-liste">Nos observations</button>
+    <div class="sync" id="sync-info"></div>
+  </section>
+
+  <!-- ============ CHASSE TERMINÉE ============ -->
+  <section class="screen" id="screen-fin">
+    <div class="fin-hero">
+      <div class="big">🏁</div>
+      <h2>Chasse terminée !</h2>
+      <p>Bien joué <span id="fin-name"></span> 👏<br>Rendez-vous à la restitution 🎤</p>
+    </div>
+    <div class="fin-recap">
+      <div class="box r"><span class="n" id="fin-nr">0</span>dangers</div>
+      <div class="box b"><span class="n" id="fin-nb">0</span>bonnes pratiques</div>
+    </div>
+    <button class="link-liste" id="btn-liste-fin">Nos observations</button>
+    <div class="sync" id="sync-info-fin"></div>
+  </section>
+
+  <!-- ============ MISSION 1 : tout sur une page ============ -->
+  <section class="screen f-m1" id="screen-risque">
+    <div class="form-top">
+      <button class="back" data-back>←</button>
+      <h2>🚨 Danger repéré</h2>
+      <button class="ex-btn" data-ex="r" title="Voir un exemple">💡</button>
+    </div>
+
+    <div class="lab">📸 La photo <span style="color:var(--grey);font-weight:600;font-size:14px">(conseillée)</span></div>
+    <input type="file" accept="image/*" capture="environment" id="photo-r" hidden>
+    <button class="photo-zone" id="photo-btn-r"><span class="big">📸</span>Appuie ici</button>
+    <div class="photo-prev" id="prev-r"><img alt=""><button class="redo" data-redo="r">Reprendre</button></div>
+
+    <div class="lab">✍️ C'est quoi le danger ?</div>
+    <textarea id="sit-r" placeholder="Ex : une rallonge traîne au sol en travers du passage"></textarea>
+
+    <div class="lab">⚠️ C'est quel risque ?</div>
+    <div class="chips" id="chips-r">
+      <button class="chip" data-v="Chute"><span class="cic">🤕</span>Chute</button>
+      <button class="chip" data-v="Électrique"><span class="cic">⚡</span>Électrique</button>
+      <button class="chip" data-v="Machine"><span class="cic">⚙️</span>Machine</button>
+      <button class="chip" data-v="Coupure"><span class="cic">🔩</span>Coupure</button>
+      <button class="chip" data-v="Manutention"><span class="cic">🏋️</span>Manutention</button>
+      <button class="chip" data-v="Incendie"><span class="cic">🔥</span>Incendie</button>
+      <button class="chip" data-v="Brûlure"><span class="cic">♨️</span>Brûlure</button>
+      <button class="chip" data-v="Chimique"><span class="cic">🧪</span>Chimique</button>
+      <button class="chip" data-v="Bruit"><span class="cic">🔊</span>Bruit</button>
+    </div>
+    <input type="text" class="autre-risque" id="risque-libre" placeholder="Un autre risque ? Écris-le ici" autocomplete="off">
+
+    <div class="lab">💡 Ton idée pour améliorer ?</div>
+    <textarea id="amelio-r" placeholder="Ex : fixer le câble en hauteur avec un passe-câble"></textarea>
+
+    <button class="cta rouge" id="send-r">Valider ✔</button>
+  </section>
+
+  <!-- ============ MISSION 2 : tout sur une page ============ -->
+  <section class="screen f-m2" id="screen-bp">
+    <div class="form-top">
+      <button class="back" data-back>←</button>
+      <h2>👍 Bonne pratique</h2>
+      <button class="ex-btn" data-ex="b" title="Voir un exemple">💡</button>
+    </div>
+
+    <div class="lab">👍 Tu as repéré quoi ?</div>
+    <div class="chips" id="chips-b">
+      <button class="chip" data-v="Extincteur"><span class="cic">🧯</span>Extincteur</button>
+      <button class="chip" data-v="Carter de protection"><span class="cic">⚙️</span>Carter</button>
+      <button class="chip" data-v="Arrêt d'urgence"><span class="cic">🔴</span>Arrêt d'urgence</button>
+      <button class="chip" data-v="Affichage sécurité"><span class="cic">📋</span>Affichage</button>
+      <button class="chip" data-v="EPI"><span class="cic">🦺</span>EPI</button>
+      <button class="chip" data-v="Rangement"><span class="cic">🧹</span>Rangement</button>
+    </div>
+    <input type="text" class="autre-risque" id="bp-libre" placeholder="Autre chose ? Écris-le ici" autocomplete="off">
+
+    <div class="lab">📸 La photo <span style="color:var(--grey);font-weight:600;font-size:14px">(conseillée)</span></div>
+    <input type="file" accept="image/*" capture="environment" id="photo-b" hidden>
+    <button class="photo-zone" id="photo-btn-b"><span class="big">📸</span>Appuie ici</button>
+    <div class="photo-prev" id="prev-b"><img alt=""><button class="redo" data-redo="b">Reprendre</button></div>
+
+    <div class="lab">✍️ Pourquoi c'est bien ?</div>
+    <textarea id="desc-b" placeholder="Ex : l'extincteur est signalé, accessible et vérifié"></textarea>
+
+    <button class="cta vert" id="send-b">Valider ✔</button>
+  </section>
+
+  <!-- ============ LISTE ============ -->
+  <section class="screen" id="screen-liste">
+    <div class="form-top">
+      <button class="back" data-back>←</button>
+      <h2>Nos observations</h2>
+      <div style="width:44px"></div>
+    </div>
+    <div id="liste-obs"></div>
+  </section>
+
+</div>
+
+<!-- exemples (volet bas) -->
+<div class="sheet-bg" id="sheet-bg"></div>
+<div class="sheet" id="sheet-r">
+  <h3>💡 Exemple — danger</h3>
+  <div class="ex-line"><span class="eic">📸</span><span><b>Photo :</b> une rallonge qui traîne au sol près de la perceuse.</span></div>
+  <div class="ex-line"><span class="eic">✍️</span><span><b>Danger :</b> le câble traverse le passage, la gaine est abîmée.</span></div>
+  <div class="ex-line"><span class="eic">⚠️</span><span><b>Risque :</b> chute + électrique.</span></div>
+  <div class="ex-line"><span class="eic">💡</span><span><b>Idée :</b> fixer le câble en hauteur ou poser un passe-câble.</span></div>
+</div>
+<div class="sheet" id="sheet-b">
+  <h3>💡 Exemple — bonne pratique</h3>
+  <div class="ex-line"><span class="eic">🧯</span><span><b>Repéré :</b> un extincteur CO2 près du tableau électrique.</span></div>
+  <div class="ex-line"><span class="eic">📸</span><span><b>Photo :</b> l'extincteur avec son panneau.</span></div>
+  <div class="ex-line"><span class="eic">✍️</span><span><b>Pourquoi c'est bien :</b> signalé, accessible, vérifié → on peut réagir vite en cas de feu.</span></div>
+</div>
+
+<div class="sheet" id="sheet-fin">
+  <h3>🏁 Terminer la chasse ?</h3>
+  <div class="ex-line"><span class="eic">⚠️</span><span>Vous ne pourrez <b>plus ajouter d'observations</b> après. Vérifiez que tout est validé !</span></div>
+  <div class="confirm-btns">
+    <button class="cta" id="fin-annuler" style="background:var(--paper);color:var(--ink);border:2px solid var(--line)">Annuler</button>
+    <button class="cta rouge" id="fin-confirmer">Oui, terminer</button>
+  </div>
+</div>
+
+<div class="flash" id="flash"><div class="check">✔</div><div class="msg">+1 observation !</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   👉👉 COLLER ICI L'URL /exec DU SCRIPT GOOGLE APPS SCRIPT 👈👈
+   ================================================================ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBUDrcQ9KUgYvtYKUv4vT4pLy7I6T3oBh0ivdjKzYahvXr2dI6CcPipipwYae0cQex/exec";
+
+let state = JSON.parse(localStorage.getItem('car_state') || '{"groupe":"","atelier":""}');
+let records = JSON.parse(localStorage.getItem('car_records') || '[]');
+let queue   = JSON.parse(localStorage.getItem('car_queue') || '[]');
+let photos  = { r:'', b:'' };
+let atelierSel = '';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ---------- accueil ---------- */
+document.querySelectorAll('.tile').forEach(b=>{
+  b.onclick = () => {
+    document.querySelectorAll('.tile').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    atelierSel = b.dataset.atelier;
+  };
+});
+$('btn-start').onclick = () => {
+  const g = $('inp-groupe').value.trim();
+  if(!g){ toast("Donnez un nom à votre équipe 😉"); return; }
+  if(!atelierSel){ toast("Choisissez votre atelier 👇"); return; }
+  state = { groupe:g, atelier:atelierSel };
+  localStorage.setItem('car_state', JSON.stringify(state));
+  enterMissions();
+};
+function enterMissions(){
+  $('tb-name').textContent = "👥 " + state.groupe;
+  refreshCounts();
+  isDone() ? showFin() : show('screen-missions');
+}
+const isDone = () => localStorage.getItem('car_done') === state.groupe;
+function showFin(){
+  const mine = records.filter(r=>r.groupe===state.groupe);
+  $('fin-name').textContent = state.groupe;
+  $('fin-nr').textContent = mine.filter(r=>r.mission==='risque').length;
+  $('fin-nb').textContent = mine.filter(r=>r.mission==='bp').length;
+  $('sync-info-fin').textContent = $('sync-info').textContent;
+  show('screen-fin');
+}
+$('btn-change').onclick = () => { $('inp-groupe').value = state.groupe; show('screen-home'); };
+function refreshCounts(){
+  const mine = records.filter(r=>r.groupe===state.groupe);
+  $('count-m1').textContent = mine.filter(r=>r.mission==='risque').length;
+  $('count-m2').textContent = mine.filter(r=>r.mission==='bp').length;
+  $('sync-info').textContent = queue.length ? ("📶 " + queue.length + " envoi(s) en attente de réseau") : "";
+}
+
+/* ---------- navigation ---------- */
+$('open-m1').onclick = () => { resetFormR(); show('screen-risque'); };
+$('open-m2').onclick = () => { resetFormB(); show('screen-bp'); };
+document.querySelectorAll('[data-back]').forEach(b=> b.onclick = () => show(isDone() ? 'screen-fin' : 'screen-missions'));
+$('btn-liste').onclick = () => { renderListe(); show('screen-liste'); };
+$('btn-liste-fin').onclick = () => { renderListe(); show('screen-liste'); };
+
+/* ---------- terminer la chasse ---------- */
+$('btn-fin').onclick = () => { $('sheet-bg').classList.add('show'); $('sheet-fin').classList.add('show'); };
+$('fin-annuler').onclick = closeSheets;
+$('fin-confirmer').onclick = async () => {
+  const btn = $('fin-confirmer');
+  btn.disabled = true; btn.textContent = "Envoi…";
+  const payload = { action:'save', mission:'fin', groupe: state.groupe, atelier: state.atelier };
+  try{
+    const rep = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const j = await rep.json();
+    if(!j.ok) throw new Error();
+  }catch(e){
+    queue.push(payload);
+    localStorage.setItem('car_queue', JSON.stringify(queue));
+  }
+  btn.disabled = false; btn.textContent = "Oui, terminer";
+  localStorage.setItem('car_done', state.groupe);
+  closeSheets();
+  refreshCounts();
+  const f = $('flash');
+  f.querySelector('.msg').textContent = "🏁 Chasse terminée !";
+  f.className = 'flash show';
+  setTimeout(()=>{ f.classList.remove('show'); f.querySelector('.msg').textContent = "+1 observation !"; showFin(); }, 1300);
+};
+
+/* ---------- exemples ---------- */
+function openSheet(key){ $('sheet-bg').classList.add('show'); $('sheet-'+key).classList.add('show'); }
+function closeSheets(){ $('sheet-bg').classList.remove('show'); $('sheet-r').classList.remove('show'); $('sheet-b').classList.remove('show'); $('sheet-fin').classList.remove('show'); }
+document.querySelectorAll('[data-ex]').forEach(b=> b.onclick = () => openSheet(b.dataset.ex));
+$('sheet-bg').onclick = closeSheets;
+
+/* ---------- photos ---------- */
+function bindPhoto(key){
+  const input = $('photo-'+key), btn = $('photo-btn-'+key), prev = $('prev-'+key);
+  btn.onclick = () => input.click();
+  prev.querySelector('.redo').onclick = () => input.click();
+  input.onchange = () => {
+    const f = input.files[0];
+    if(!f) return;
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1200;
+      let w = img.width, h = img.height;
+      if(Math.max(w,h) > MAX){ const k = MAX/Math.max(w,h); w=Math.round(w*k); h=Math.round(h*k); }
+      const c = document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      photos[key] = c.toDataURL('image/jpeg', .7).split(',')[1];
+      prev.querySelector('img').src = 'data:image/jpeg;base64,' + photos[key];
+      prev.style.display = 'block';
+      btn.style.display = 'none';
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(f);
+  };
+}
+bindPhoto('r'); bindPhoto('b');
+
+/* ---------- pastilles ---------- */
+['chips-r','chips-b'].forEach(id=> $(id).querySelectorAll('.chip').forEach(c=> c.onclick = () => c.classList.toggle('on')));
+const chipValues = id => [...$(id).querySelectorAll('.chip.on')].map(c=>c.dataset.v);
+
+function resetPhoto(key){
+  photos[key]=''; $('photo-'+key).value='';
+  $('prev-'+key).style.display='none';
+  $('photo-btn-'+key).style.display='flex';
+}
+function resetFormR(){
+  resetPhoto('r'); $('sit-r').value=''; $('amelio-r').value=''; $('risque-libre').value='';
+  $('chips-r').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+}
+function resetFormB(){
+  resetPhoto('b'); $('desc-b').value=''; $('bp-libre').value='';
+  $('chips-b').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+}
+
+/* ---------- envoi ---------- */
+async function send(payload, btn, color){
+  btn.disabled = true;
+  const old = btn.textContent;
+  btn.textContent = "Envoi…";
+  try{
+    const rep = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const j = await rep.json();
+    if(!j.ok) throw new Error(j.error || 'réponse invalide');
+  }catch(e){
+    queue.push(payload);
+    localStorage.setItem('car_queue', JSON.stringify(queue));
+  }
+  btn.disabled = false;
+  btn.textContent = old;
+  records.push(payload);
+  localStorage.setItem('car_records', JSON.stringify(records));
+  refreshCounts();
+  celebrate(color);
+}
+function celebrate(color){
+  const f = $('flash');
+  f.className = 'flash show' + (color==='rouge' ? ' rouge' : '');
+  setTimeout(()=>{ f.classList.remove('show'); show('screen-missions'); }, 1100);
+}
+async function flushQueue(){
+  if(!queue.length) return;
+  const pending = [...queue];
+  for(const p of pending){
+    try{
+      const rep = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(p) });
+      const j = await rep.json();
+      if(j.ok){ queue.shift(); localStorage.setItem('car_queue', JSON.stringify(queue)); }
+      else break;
+    }catch(e){ break; }
+  }
+  refreshCounts();
+}
+setInterval(flushQueue, 20000);
+window.addEventListener('online', flushQueue);
+
+$('send-r').onclick = () => {
+  const libre = $('risque-libre').value.trim();
+  const risques = chipValues('chips-r');
+  if(libre) risques.push(libre);
+  if(!$('sit-r').value.trim()){ toast("✍️ Décris le danger"); return; }
+  if(!risques.length){ toast("⚠️ Choisis ou écris un risque"); return; }
+  if(!$('amelio-r').value.trim()){ toast("💡 Propose une idée d'amélioration"); return; }
+  send({
+    action:'save', mission:'risque',
+    groupe: state.groupe, atelier: state.atelier,
+    situation: $('sit-r').value.trim(),
+    risque: risques.join(', '),
+    amelioration: $('amelio-r').value.trim(),
+    photo: photos.r
+  }, $('send-r'), 'rouge');
+};
+$('send-b').onclick = () => {
+  const libre = $('bp-libre').value.trim();
+  const types = chipValues('chips-b');
+  if(libre) types.push(libre);
+  if(!types.length){ toast("👍 Choisis ou écris ce que tu as repéré"); return; }
+  if(!$('desc-b').value.trim()){ toast("✍️ Explique pourquoi c'est bien"); return; }
+  send({
+    action:'save', mission:'bp',
+    groupe: state.groupe, atelier: state.atelier,
+    type: types.join(', '),
+    description: $('desc-b').value.trim(),
+    photo: photos.b
+  }, $('send-b'), 'vert');
+};
+
+/* ---------- liste ---------- */
+function renderListe(){
+  const box = $('liste-obs');
+  const mine = records.filter(r=>r.groupe===state.groupe);
+  if(!mine.length){
+    box.innerHTML = '<p style="color:var(--grey);font-weight:600;text-align:center;margin-top:30px">Rien pour l\'instant.<br>À la chasse ! 🕵️</p>';
+    return;
+  }
+  box.innerHTML = mine.map(r => r.mission==='risque'
+    ? `<div class="obs"><span class="tag r">🚨 ${esc(r.risque)}</span>${esc(r.situation)}<p>💡 ${esc(r.amelioration)}</p></div>`
+    : `<div class="obs"><span class="tag b">👍 ${esc(r.type)}</span>${esc(r.description)}</div>`
+  ).join('');
+}
+
+if(state.groupe && state.atelier){ enterMissions(); }
+</script>
+</body>
+</html>
